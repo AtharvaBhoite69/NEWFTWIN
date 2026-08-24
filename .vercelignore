@@ -1,0 +1,7 @@
+node_modules
+.git
+.env*
+*.py
+*.log
+*.zip
+server/data/*.db*
