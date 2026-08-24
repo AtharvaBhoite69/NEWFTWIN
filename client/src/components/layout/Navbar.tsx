@@ -69,16 +69,18 @@ export default function Navbar() {
         left: 0,
         right: 0,
         zIndex: 100,
-        // On landing page: transparent until hovered. On other pages: always solid.
         background: (!isLandingPage || hovered)
-          ? `color-mix(in srgb, var(--bg-primary) 90%, transparent)`
+          ? 'var(--glass-bg-strong)'
           : 'transparent',
-        backdropFilter: (!isLandingPage || hovered) ? 'blur(20px)' : 'none',
-        WebkitBackdropFilter: (!isLandingPage || hovered) ? 'blur(20px)' : 'none',
+        backdropFilter: (!isLandingPage || hovered) ? 'blur(40px) saturate(1.8)' : 'none',
+        WebkitBackdropFilter: (!isLandingPage || hovered) ? 'blur(40px) saturate(1.8)' : 'none',
         borderBottom: (!isLandingPage || hovered)
-          ? '1px solid var(--border-subtle)'
+          ? '1px solid var(--glass-border)'
           : '1px solid transparent',
-        transition: 'background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease',
+        boxShadow: (!isLandingPage || hovered)
+          ? '0 1px 0 rgba(255,255,255,0.6), 0 4px 24px rgba(0,0,0,0.08)'
+          : 'none',
+        transition: 'background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
       }}
     >
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 24px' }}>
