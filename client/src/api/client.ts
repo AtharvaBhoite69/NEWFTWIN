@@ -1,6 +1,11 @@
-const API_BASE = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/api';
+const getApiBase = (): string => {
+  const rawUrl = import.meta.env.VITE_API_URL;
+  if (!rawUrl || typeof rawUrl !== 'string') return '/api';
+  const clean = rawUrl.trim().replace(/\/$/, '');
+  return clean.endsWith('/api') ? clean : `${clean}/api`;
+};
+
+const API_BASE = getApiBase();
 
 class ApiClient {
   private accessToken: string | null = null;
