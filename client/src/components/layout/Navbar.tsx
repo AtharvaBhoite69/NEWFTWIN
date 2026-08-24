@@ -27,7 +27,11 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  // Only go transparent on the landing page
+  const isLandingPage = location.pathname === '/';
 
   const filteredNav = navItems.filter(item =>
     !item.authRequired || isAuthenticated
@@ -57,16 +61,24 @@ export default function Navbar() {
 
   return (
     <nav
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         zIndex: 100,
-        background: `color-mix(in srgb, var(--bg-primary) 85%, transparent)`,
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid var(--border-subtle)',
+        // On landing page: transparent until hovered. On other pages: always solid.
+        background: (!isLandingPage || hovered)
+          ? `color-mix(in srgb, var(--bg-primary) 90%, transparent)`
+          : 'transparent',
+        backdropFilter: (!isLandingPage || hovered) ? 'blur(20px)' : 'none',
+        WebkitBackdropFilter: (!isLandingPage || hovered) ? 'blur(20px)' : 'none',
+        borderBottom: (!isLandingPage || hovered)
+          ? '1px solid var(--border-subtle)'
+          : '1px solid transparent',
+        transition: 'background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease',
       }}
     >
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 24px' }}>
@@ -75,13 +87,14 @@ export default function Navbar() {
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <div style={{
               width: 32, height: 32, borderRadius: 8,
-              background: 'var(--text-primary)',
+              background: (isLandingPage && !hovered) ? 'rgba(255,255,255,0.95)' : 'var(--text-primary)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'var(--bg-primary)', fontWeight: 800, fontSize: 14,
+              color: (isLandingPage && !hovered) ? '#000' : 'var(--bg-primary)', fontWeight: 800, fontSize: 14,
+              transition: 'background 0.35s ease, color 0.35s ease',
             }}>
               FT
             </div>
-            <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+            <span style={{ fontWeight: 700, fontSize: 18, letterSpacing: '-0.02em', color: (isLandingPage && !hovered) ? '#fff' : 'var(--text-primary)', transition: 'color 0.35s ease' }}>
               FTWIN
             </span>
           </Link>
@@ -98,8 +111,12 @@ export default function Navbar() {
                   borderRadius: 8,
                   fontSize: 13,
                   fontWeight: location.pathname === item.path ? 600 : 400,
-                  color: location.pathname === item.path ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  background: location.pathname === item.path ? 'var(--accent-subtle)' : 'transparent',
+                  color: (isLandingPage && !hovered)
+                    ? (location.pathname === item.path ? '#fff' : 'rgba(255,255,255,0.75)')
+                    : (location.pathname === item.path ? 'var(--text-primary)' : 'var(--text-secondary)'),
+                  background: location.pathname === item.path
+                    ? (isLandingPage && !hovered) ? 'rgba(255,255,255,0.12)' : 'var(--accent-subtle)'
+                    : 'transparent',
                   transition: 'all 0.2s ease',
                   whiteSpace: 'nowrap',
                 }}
