@@ -63,10 +63,25 @@ class ApiClient {
       throw new Error('Authentication required');
     }
 
-    const data = await response.json();
+    let data: any;
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      try {
+        data = await response.json();
+      } catch (err: any) {
+        throw new Error(`Server returned invalid JSON response: ${err.message}`);
+      }
+    } else {
+      const rawText = await response.text();
+      if (!response.ok) {
+        throw new Error(`Server error (${response.status}): ${rawText.slice(0, 150)}`);
+      }
+      throw new Error(`Expected JSON from ${API_BASE}${path} but received HTML/Text. Please verify VITE_API_URL is configured.`);
+    }
 
     if (!response.ok) {
-      throw new Error(data.error || 'Request failed');
+      throw new Error(data?.error || data?.message || 'Request failed');
     }
 
     return data;
@@ -81,9 +96,11 @@ class ApiClient {
       });
 
       if (!response.ok) return false;
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) return false;
 
       const data = await response.json();
-      if (data.success && data.data) {
+      if (data?.success && data?.data) {
         this.setTokens(data.data.accessToken, data.data.refreshToken);
         return true;
       }
