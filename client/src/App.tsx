@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { FinancialProvider } from './contexts/FinancialContext';
 import Navbar from './components/layout/Navbar';
+import FtwinIntro from './components/FtwinIntro';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Auth/Login';
 import RegisterPage from './pages/Auth/Register';
@@ -17,6 +18,7 @@ import GoalsPage from './pages/Goals';
 import ChatPage from './pages/Chat';
 import ProfilePage from './pages/Profile';
 import BankPage from './pages/Bank';
+import React, { useState } from 'react';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -62,15 +64,29 @@ function AppRoutes() {
 }
 
 export default function App() {
+  // Only play the intro once per browser tab session
+  const [showIntro, setShowIntro] = useState(() => {
+    const seen = sessionStorage.getItem('ftwin_intro_seen');
+    return !seen;
+  });
+
+  const handleIntroComplete = () => {
+    sessionStorage.setItem('ftwin_intro_seen', '1');
+    setShowIntro(false);
+  };
+
   return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <AuthProvider>
-          <FinancialProvider>
-            <AppRoutes />
-          </FinancialProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <>
+      {showIntro && <FtwinIntro onComplete={handleIntroComplete} />}
+      <BrowserRouter>
+        <ThemeProvider>
+          <AuthProvider>
+            <FinancialProvider>
+              <AppRoutes />
+            </FinancialProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </>
   );
 }
